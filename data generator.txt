@@ -1,0 +1,100 @@
+[
+  "{{repeat(5)}}",
+  {
+    "FirstName":'{{firstName("female")}}',
+    "LastName":'{{surname("female")}}',
+    "Username": function(){return this.created;},
+    "Email":'{{email()}}',
+    "Gender": '{{gender()}}',
+    "DateOfBirth": '{{date(new Date(1950, 0, 1), new Date(1999,11,31), "YYYY-MM-dd")}}',
+    "Password": "password",
+    "Created": '{{date(new Date(2017, 0, 1), new Date(2017, 11, 31), "YYYY-MM-dd")}}',
+    "LastActive": function(){return this.created;},
+    "Introduction":'{{lorem(2, "paragraphs")}}',
+    "Interests":'{{lorem(6, "words")}}',
+    "City": "{{city()}}",
+    "Country": "{{country()}}",
+      "Education":[
+        "{{repeat(3)}}",
+        {
+         "School":'{{lorem(6, "words")}}',
+          "Degree":'{{lorem(4, "words")}}',
+          "Field":'{{lorem(6, "words")}}',
+          "Grade": "B",
+          "StartYear":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "YYYY")}}',
+          "EndYear":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "YYYY")}}'
+        }
+    ],
+      "WorkExperiences":[
+          "{{repeat(3)}}",
+        {
+         "Title":'{{lorem(6, "words")}}',
+          "Company":'{{lorem(6, "words")}}',
+          "Location":"{{city()}}",
+          "StartMonth":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "MM")}}',
+          "StartYear":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "YYYY")}}',
+          "IsCurrentlyWorking":false,
+          "EndMonth":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "MM")}}',
+          "EndYear":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "YYYY")}}',
+          "Description":'{{lorem(2,"paragraphs")}}'
+        }
+    ],
+      "Skills":[
+        {
+          "Name":"C#",
+          "Experience":"4"
+        },
+        {
+          "Name":"Asp.Net MVC",
+          "Experience":"3"
+        },
+        {
+          "Name":"Angular",
+          "Experience":"2"
+        },
+        {
+          "Name":"Css",
+          "Experience":"2"
+        },
+        {
+          "Name":"JavaScript",
+          "Experience":"2"
+        },
+        {
+          "Name":"NodeJs",
+          "Experience":"1"
+        },
+        {
+          "Name":"Entity Framework",
+          "Experience":"4"
+        },
+        {
+          "Name":"Ado.Net",
+          "Experience":"4"
+        }
+        
+    ],
+      "Projects":[
+                 "{{repeat(3)}}",
+        {
+          "Name":'{{lorem(6,"words")}}',
+          "StartMonth":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "MM")}}',
+          "StartYear":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "YYYY")}}',
+          "IsOnGoing":false,
+         "EndMonth":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "MM")}}',
+          "EndYear":'{{date(new Date(2000, 0, 1), new Date(2018,2,31), "YYYY")}}',
+          "Description":'{{lorem(2, "paragraphs")}}',         
+          "Url":"github.com/knowthehp/"
+        }     
+        
+    ],
+      "Photos": [
+      {
+        "url": function(num){
+          return "https://randomuser.me/api/portraits/female/"+num.integer(1,22)+".jpg";
+        },
+        "isMain": true
+      }
+     ]
+  }
+ ]
