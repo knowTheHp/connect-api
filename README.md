@@ -45,7 +45,7 @@ This **API** is made with asp.net core for the Connect Angular Application.
     * Work Experience
     
     
-*** Auth Controller ***
+**Auth Controller**
 Auth Controller takes care of user registration and login. A repository is added i.e. [IAuthRepository](https://github.com/knowTheHp/connect-api/blob/master/Data/IAuthRepository.cs) that stores the user information in the database and validates the user for the same.
 
 ```c#
@@ -127,7 +127,7 @@ namespace ConnectApi.Controllers
 }
 ````
 
-*** IAUth Repo ***
+**IAUth Repo**
 
 ```c#
 using System.Threading.Tasks;
@@ -144,7 +144,7 @@ namespace ConnectApi.Data
     }
 }
 ```
-*** Auth Repo ***
+**Auth Repo**
 ```c#
 using System;
 using System.Security.Cryptography;
