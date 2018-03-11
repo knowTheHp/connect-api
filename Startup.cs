@@ -2,6 +2,7 @@
 using System.Text;
 using AutoMapper;
 using connect_api.Data;
+using connect_api.Helpers;
 using ConnectApi.Data;
 using ConnectApi.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -31,6 +32,7 @@ namespace ConnectApi
             services.AddAutoMapper();
             services.AddMvc();
             services.AddCors();
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IConnectRepository, ConnectRepository>();
 
