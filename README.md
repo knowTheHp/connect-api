@@ -46,7 +46,50 @@ This **API** is made with asp.net core for the Connect Angular Application.
     
     
 ## Code
-    
+
+**User Model**
+<br/>
+```c#
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace ConnectApi.Models
+{
+    public class User
+    {
+        public int Id { get; set; }
+        public string Firstname { get; set; }
+        public string Lastname { get; set; }
+        public string Username { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] passwordSalt { get; set; }
+        public string Gender { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime LastActive { get; set; }
+        public string Introduction { get; set; }
+        public string Interests { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+
+        //1 to many
+        public ICollection<Education> Education { get; set; }
+        public ICollection<WorkExperience> WorkExperiences { get; set; }
+        public ICollection<Skill> Skills { get; set; }
+        public ICollection<Project> Projects { get; set; }
+        public ICollection<Photo> Photos { get; set; }
+
+        public User()
+        {
+
+        }
+    }
+}
+```
 **Auth Controller**
 <br/>
 Auth Controller takes care of user registration and login. A repository is created [IAuthRepository](https://github.com/knowTheHp/connect-api/blob/master/Data/IAuthRepository.cs) that takes care of storing the user information in the database and validates the user for the same.
