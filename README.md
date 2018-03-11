@@ -49,7 +49,7 @@ This **API** is made with asp.net core for the Connect Angular Application.
     
 **Auth Controller**
 <br/>
-Auth Controller takes care of user registration and login. A repository is added i.e. [IAuthRepository](https://github.com/knowTheHp/connect-api/blob/master/Data/IAuthRepository.cs) that stores the user information in the database and validates the user for the same.
+Auth Controller takes care of user registration and login. A repository is created [IAuthRepository](https://github.com/knowTheHp/connect-api/blob/master/Data/IAuthRepository.cs) that takes care of storing the user information in the database and validates the user for the same.
 ```c#
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -216,7 +216,7 @@ namespace ConnectApi.Data
 
 **User Controller**
 <br/>
-User Controller is all about handling user requests. The request could be to display a list of other users and their profiles or to update user details.
+User Controller is all about handling user requests. The request could be to display a list of other users and their profiles or to update user details. A repository [IConnectRepository](https://github.com/knowTheHp/connect-api/blob/master/Data/IAuthRepository.cs) is created that takes care of handling the requests.
 ```c#
 using System;
 using System.Collections.Generic;
@@ -285,6 +285,64 @@ namespace connect_api.Controllers
 
             throw new Exception($"Upating user {id} failed on save");
         }
+    }
+}
+```
+**IConnect Repo**
+```c#
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ConnectApi.Models;
+
+namespace connect_api.Data
+{
+    public interface IConnectRepository
+    {
+        void Add<T>(T entity) where T : class;
+        void Delete<T>(T entity) where T : class;
+        Task<bool> SaveAll();
+
+        Task<IEnumerable<User>> GetUsers();
+        Task<User> GetUser(int id);
+    }
+}
+```
+
+**Connect Repo**
+```c#
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ConnectApi.Data;
+using ConnectApi.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace connect_api.Data
+{
+    public class ConnectRepository : IConnectRepository
+    {
+        private readonly DataContext _context;
+        public ConnectRepository(DataContext context) => this._context = context;
+        public void Add<T>(T entity) where T : class => _context.Add(entity);
+        public void Delete<T>(T entity) where T : class => _context.Remove(entity);
+        public async Task<User> GetUser(int id)
+        {
+            var user = await this._context.User.Include(p => p.Photos)
+            .Include(e => e.Education).Include(proj => proj.Projects)
+            .Include(s => s.Skills).Include(w => w.WorkExperiences)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+            return user;
+        }
+        public async Task<IEnumerable<User>> GetUsers()
+        {
+            var users = await this._context.User.Include(p => p.Photos)
+            .Include(s => s.Skills)
+            .ToListAsync();
+
+            return users;
+        }
+        public async Task<bool> SaveAll() => await this._context.SaveChangesAsync() > 0;
     }
 }
 ```
