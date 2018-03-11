@@ -36,6 +36,11 @@ namespace connect_api.Controllers
             this._cloudinary = new Cloudinary(account);
         }
 
+        [HttpGet("{id}", Name = "GetPhoto")]
+        public async Task<IActionResult> GetPhotos(int id)
+        {
+            return Ok();
+        }
         //add photos
         [HttpPost]
         public async Task<IActionResult> AddPhoto(int userId, PhotoCreationDto photoDto)
