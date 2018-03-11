@@ -23,7 +23,6 @@ namespace ConnectApi.Controllers
         {
             this._authRepository = repo;
             this._config = config;
-
         }
 
         [HttpPost("register")]

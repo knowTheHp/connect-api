@@ -23,6 +23,9 @@ namespace connect_api.Helpers
             CreateMap<Skill, SkillDetailDto>();
             CreateMap<Project, ProjectDetailDto>();
             CreateMap<Photo, PhotoDetailDto>();
+
+            //update dto
+            CreateMap<UserUpdateDto, User>();
         }
     }
 }

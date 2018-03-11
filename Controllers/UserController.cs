@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using connect_api.Data;
@@ -36,6 +38,32 @@ namespace connect_api.Controllers
             var user = await this._connectRepository.GetUser(id);
             var returnUser = this._mapper.Map<UserDetailDto>(user);
             return Ok(returnUser);
+        }
+
+        //update user
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto userUpdateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            //get current user
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            //get user from repo
+            var user = await this._connectRepository.GetUser(id);
+
+            if (user == null)
+                return NotFound($"could not find user with an id of {id}");
+
+            if (currentUserId != user.Id)
+                return Unauthorized();
+
+            this._mapper.Map(userUpdateDto, user);
+            if (await this._connectRepository.SaveAll())
+                return NoContent();
+
+            throw new Exception($"Upating user {id} failed on save");
         }
     }
 }
