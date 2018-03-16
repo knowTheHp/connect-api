@@ -46,7 +46,50 @@ This **API** is made with asp.net core for the Connect Angular Application.
     
     
 ## Code
-    
+
+**User Model**
+<br/>
+```c#
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace ConnectApi.Models
+{
+    public class User
+    {
+        public int Id { get; set; }
+        public string Firstname { get; set; }
+        public string Lastname { get; set; }
+        public string Username { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] passwordSalt { get; set; }
+        public string Gender { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime LastActive { get; set; }
+        public string Introduction { get; set; }
+        public string Interests { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+
+        //1 to many
+        public ICollection<Education> Education { get; set; }
+        public ICollection<WorkExperience> WorkExperiences { get; set; }
+        public ICollection<Skill> Skills { get; set; }
+        public ICollection<Project> Projects { get; set; }
+        public ICollection<Photo> Photos { get; set; }
+
+        public User()
+        {
+
+        }
+    }
+}
+```
 **Auth Controller**
 <br/>
 Auth Controller takes care of user registration and login. A repository is created [IAuthRepository](https://github.com/knowTheHp/connect-api/blob/master/Data/IAuthRepository.cs) that takes care of storing the user information in the database and validates the user for the same.
@@ -345,4 +388,186 @@ namespace connect_api.Data
         public async Task<bool> SaveAll() => await this._context.SaveChangesAsync() > 0;
     }
 }
+```
+
+**AutoMapper**
+<br/>
+```c#
+using System.Linq;
+using AutoMapper;
+using connect_api.Dtos;
+using ConnectApi.Helpers;
+using ConnectApi.Models;
+
+namespace connect_api.Helpers
+{
+    public class AutoMapperProfiles : Profile
+    {
+        public AutoMapperProfiles()
+        {
+            CreateMap<User, UserListDto>()
+            .ForMember(destination => destination.PhotoUrl, option => option.MapFrom(src => src.Photos.FirstOrDefault(photo => photo.IsMain).Url))
+            .ForMember(destination => destination.Age, option => option.ResolveUsing(d => d.DateOfBirth.CalculateAge()));
+
+            CreateMap<User, UserDetailDto>()
+            .ForMember(destination => destination.PhotoUrl, option => option.MapFrom(src => src.Photos.FirstOrDefault(photo => photo.IsMain).Url))
+            .ForMember(destination => destination.Age, option => option.ResolveUsing(d => d.DateOfBirth.CalculateAge()));
+
+            CreateMap<Education, EducationDetailDto>();
+            CreateMap<WorkExperience, WorkExperienceDetailDto>();
+            CreateMap<Skill, SkillDetailDto>();
+            CreateMap<Project, ProjectDetailDto>();
+            CreateMap<Photo, PhotoDetailDto>();
+
+            //update dto
+            CreateMap<UserUpdateDto, User>();
+        }
+    }
+}
+```
+**Data Context**
+<br/>
+This application uses **Entity Framework** for database connectivity. It requires a DbContext object for the same.
+```c#
+using ConnectApi.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace ConnectApi.Data
+{
+    public class DataContext : DbContext
+    {
+        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+        public DbSet<Value> Values { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<Education> Education { get; set; }
+        public DbSet<Photo> Photo { get; set; }
+        public DbSet<Project> Project { get; set; }
+        public DbSet<Skill> Skill { get; set; }
+        public DbSet<WorkExperience> WorkExperience { get; set; }
+    }
+}
+```
+**appSettings.json**
+<br/>
+
+The file contains json token key, connection string, and cloudinary configuration 
+```javascript
+{
+  "AppSettings": {
+    "Token": "this is a super secret key"
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=.;Database = ypour;Trusted_Connection = True;"
+  },
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    },
+    "CloudinarySettings": {
+      "CloudName": "your cloud name",
+      "ApiKey": "your api key",
+      "ApiSecret": "your secret key"
+    }
+  }
+}
+```
+
+**Startup.cs**
+<br/>
+
+```c#
+using System.Net;
+using System.Text;
+using AutoMapper;
+using connect_api.Data;
+using connect_api.Helpers;
+using ConnectApi.Data;
+using ConnectApi.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+
+namespace ConnectApi
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration) => Configuration = configuration;
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:Token").Value);
+            services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<Seed>();
+            services.AddAutoMapper();
+            services.AddMvc();
+            services.AddCors();
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IConnectRepository, ConnectRepository>();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+            services.AddMvc().AddJsonOptions(opt =>
+            {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Seed seed)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                //global exception handler
+                app.UseExceptionHandler(builder =>
+                {
+                    builder.Run(async context =>
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if (error != null)
+                        {
+                            context.Response.AddApplicationError(error.Error.Message);
+                            await context.Response.WriteAsync(error.Error.Message).ConfigureAwait(false);
+                        }
+                    });
+                });
+            }
+            //seed.SeedUser();
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials());
+            app.UseAuthentication();
+            app.UseMvc();
+        }
+    }
+}
+
 ```
