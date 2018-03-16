@@ -428,6 +428,7 @@ namespace connect_api.Helpers
 
 **Photo Controller**
 <br/>
+Photo Controller takes care of photo upload and save it to cloudinary. It stores the public id and path of the image in db.
 ```c#
 using System.IO;
 using System.Linq;
