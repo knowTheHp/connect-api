@@ -29,6 +29,11 @@ namespace connect_api.Data
 
             return users;
         }
+        public Task<Photo> GetPhoto(int id)
+        {
+            var photo = this._context.Photo.FirstOrDefaultAsync(pic => pic.Id == id);
+            return photo;
+        }
         public async Task<bool> SaveAll() => await this._context.SaveChangesAsync() > 0;
     }
 }

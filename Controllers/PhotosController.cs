@@ -37,10 +37,14 @@ namespace connect_api.Controllers
         }
 
         [HttpGet("{id}", Name = "GetPhoto")]
-        public async Task<IActionResult> GetPhotos(int id)
+        public async Task<IActionResult> GetPhoto(int id)
         {
-            return Ok();
+            var photo = await this._connectRepository.GetPhoto(id);
+            var PhotoFetchDto = this._mapper.Map<PhotoFetchDto>(photo);
+            return Ok(PhotoFetchDto);
+
         }
+
         //add photos
         [HttpPost]
         public async Task<IActionResult> AddPhoto(int userId, PhotoCreationDto photoDto)
@@ -76,9 +80,10 @@ namespace connect_api.Controllers
                 photo.IsMain = true;
 
             user.Photos.Add(photo);
+            var returnPhoto = this._mapper.Map<PhotoFetchDto>(photo);
             if (await this._connectRepository.SaveAll())
             {
-                return Ok();
+                return CreatedAtRoute("GetPhoto", new { id = photo.Id }, returnPhoto);
             }
             else
             {

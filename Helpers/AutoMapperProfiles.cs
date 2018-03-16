@@ -26,6 +26,10 @@ namespace connect_api.Helpers
 
             //update dto
             CreateMap<UserUpdateDto, User>();
+
+            //fetch phoyo
+            CreateMap<PhotoCreationDto, Photo>();
+            CreateMap<Photo, PhotoFetchDto>();
         }
     }
 }
