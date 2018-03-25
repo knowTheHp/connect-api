@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ConnectApi.Data;
 using ConnectApi.Models;
@@ -29,11 +30,15 @@ namespace connect_api.Data
 
             return users;
         }
+        public async Task<bool> SaveAll() => await this._context.SaveChangesAsync() > 0;
         public Task<Photo> GetPhoto(int id)
         {
             var photo = this._context.Photo.FirstOrDefaultAsync(pic => pic.Id == id);
             return photo;
         }
-        public async Task<bool> SaveAll() => await this._context.SaveChangesAsync() > 0;
+        public Task<Photo> GetMainPhoto(int userId)
+        {
+            return this._context.Photo.Where(userPhoto => userPhoto.UserId == userId).FirstOrDefaultAsync(p => p.IsMain);
+        }
     }
 }
