@@ -3,6 +3,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using connect_api.Dtos;
 using ConnectApi.Data;
 using ConnectApi.Dtos;
 using ConnectApi.Models;
@@ -19,10 +21,12 @@ namespace ConnectApi.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly IConfiguration _config;
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        private readonly IMapper _mapper;
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
             this._authRepository = repo;
             this._config = config;
+            this._mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -70,7 +74,8 @@ namespace ConnectApi.Controllers
             };
             var token = tokenHandler.CreateToken(tokenDescription);
             var tokenString = tokenHandler.WriteToken(token);
-            return Ok(new { tokenString });
+            var userDto = this._mapper.Map<UserListDto>(user);
+            return Ok(new { tokenString, userDto });
         }
     }
 }
