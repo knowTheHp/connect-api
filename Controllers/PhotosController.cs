@@ -117,5 +117,37 @@ namespace connect_api.Controllers
 
             return BadRequest("Could not set your new profile photo");
         }
+
+        [HttpDelete("{photoId}")]
+        public async Task<IActionResult> DeletePhoto(int userId, int photoId)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            var photoFromDb = await this._connectRepository.GetPhoto(photoId);
+            if (photoFromDb == null)
+                return NotFound();
+
+            if (photoFromDb.IsMain)
+                return BadRequest("You cannot delete the main photo.");
+            if (photoFromDb.PublicId != null)
+            {
+
+                var deleteParams = new DeletionParams(photoFromDb.PublicId);
+                var result = this._cloudinary.Destroy(deleteParams);
+                if (result.Result == "ok")
+                    this._connectRepository.Delete(photoFromDb);
+            }
+
+            if (photoFromDb.PublicId == null)
+            {
+                this._connectRepository.Delete(photoFromDb);
+            }
+
+            if (await this._connectRepository.SaveAll())
+                return Ok();
+
+            return BadRequest("Failed to delete the photo");
+        }
     }
 }
