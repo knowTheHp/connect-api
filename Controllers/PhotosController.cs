@@ -66,6 +66,8 @@ namespace connect_api.Controllers
                     ImageUploadParams uploadPrams = new ImageUploadParams()
                     {
                         File = new FileDescription(file.Name, stream),
+                        Transformation = new Transformation()
+.Width(500).Height(500).Crop("fill").Gravity("face")
                     };
                     uploadResult = this._cloudinary.Upload(uploadPrams);
                 }
@@ -89,6 +91,31 @@ namespace connect_api.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [HttpPost("{photoId}/setMain")]
+        public async Task<IActionResult> setProfilePicture(int userId, int photoId)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            var newProfilePic = await this._connectRepository.GetPhoto(photoId);
+            if (newProfilePic == null)
+                return NotFound();
+
+            if (newProfilePic.IsMain)
+                return BadRequest("This is already your profile photo");
+
+            var currentProfilePic = await this._connectRepository.GetMainPhoto(userId);
+            if (currentProfilePic != null)
+                currentProfilePic.IsMain = false;
+
+            newProfilePic.IsMain = true;
+
+            if (await this._connectRepository.SaveAll())
+                return NoContent();
+
+            return BadRequest("Could not set your new profile photo");
         }
     }
 }
