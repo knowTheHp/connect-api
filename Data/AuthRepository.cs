@@ -34,7 +34,7 @@ namespace ConnectApi.Data
 
         public async Task<User> Login(string email, string password)
         {
-            var user = await _context.User.FirstOrDefaultAsync(x => x.Email == email);
+            var user = await _context.User.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Email == email);
             if (user == null) return null;
             if (!VerifyPassword(password, user.PasswordHash, user.passwordSalt)) return null;
             return user;
