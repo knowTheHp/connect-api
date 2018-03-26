@@ -82,9 +82,10 @@ namespace connect_api.Controllers
                 photo.IsMain = true;
 
             user.Photos.Add(photo);
-            var returnPhoto = this._mapper.Map<PhotoFetchDto>(photo);
+
             if (await this._connectRepository.SaveAll())
             {
+                var returnPhoto = this._mapper.Map<PhotoFetchDto>(photo);
                 return CreatedAtRoute("GetPhoto", new { id = photo.Id }, returnPhoto);
             }
             else
