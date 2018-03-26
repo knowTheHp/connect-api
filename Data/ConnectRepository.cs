@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using connect_api.Helpers;
 using ConnectApi.Data;
 using ConnectApi.Models;
 using Microsoft.EntityFrameworkCore;
@@ -22,14 +23,14 @@ namespace connect_api.Data
 
             return user;
         }
-        public async Task<IEnumerable<User>> GetUsers()
+        public async Task<PagedList<User>> GetUsers(UserPaginationParameter userPagination)
         {
-            var users = await this._context.User.Include(p => p.Photos)
-            .Include(s => s.Skills)
-            .ToListAsync();
+            var users = this._context.User.Include(p => p.Photos)
+            .Include(s => s.Skills);
 
-            return users;
+            return await PagedList<User>.CreateAsync(users, userPagination.PageNumber, userPagination.PageSize);
         }
+
         public async Task<bool> SaveAll() => await this._context.SaveChangesAsync() > 0;
         public Task<Photo> GetPhoto(int id)
         {

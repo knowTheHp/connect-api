@@ -6,6 +6,7 @@ using AutoMapper;
 using connect_api.Data;
 using connect_api.Dtos;
 using connect_api.Helpers;
+using ConnectApi.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,10 +27,13 @@ namespace connect_api.Controllers
 
         //get users
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers(UserPaginationParameter userPagination)
         {
-            var users = await this._connectRepository.GetUsers();
+            var users = await this._connectRepository.GetUsers(userPagination);
             var returnUsers = this._mapper.Map<IEnumerable<UserListDto>>(users);
+
+            Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+
             return Ok(returnUsers);
         }
 

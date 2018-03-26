@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using connect_api.Helpers;
 using ConnectApi.Models;
 
 namespace connect_api.Data
@@ -10,7 +10,7 @@ namespace connect_api.Data
         void Delete<T>(T entity) where T : class;
         Task<bool> SaveAll();
 
-        Task<IEnumerable<User>> GetUsers();
+        Task<PagedList<User>> GetUsers(UserPaginationParameter userPagination);
         Task<User> GetUser(int id);
         Task<Photo> GetPhoto(int id);
         Task<Photo> GetMainPhoto(int userId);
