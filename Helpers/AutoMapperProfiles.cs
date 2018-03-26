@@ -1,6 +1,7 @@
 using System.Linq;
 using AutoMapper;
 using connect_api.Dtos;
+using ConnectApi.Dtos;
 using ConnectApi.Helpers;
 using ConnectApi.Models;
 
@@ -30,6 +31,9 @@ namespace connect_api.Helpers
             //fetch phoyo
             CreateMap<PhotoCreationDto, Photo>();
             CreateMap<Photo, PhotoFetchDto>();
+
+            //registration dto
+            CreateMap<UserDto, User>();
         }
     }
 }
