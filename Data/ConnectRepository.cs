@@ -25,8 +25,7 @@ namespace connect_api.Data
         }
         public async Task<PagedList<User>> GetUsers(UserPaginationParameter userPagination)
         {
-            var users = this._context.User.Include(p => p.Photos)
-            .Include(s => s.Skills);
+            var users = this._context.User;
 
             return await PagedList<User>.CreateAsync(users, userPagination.PageNumber, userPagination.PageSize);
         }
