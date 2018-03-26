@@ -32,7 +32,7 @@ namespace connect_api.Controllers
         }
 
         //get user
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await this._connectRepository.GetUser(id);
