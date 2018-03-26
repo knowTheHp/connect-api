@@ -13,7 +13,7 @@ namespace connect_api.Helpers
         {
             var actionExecutedContext = await next();
             var userId = int.Parse(actionExecutedContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var connectRepo = actionExecutedContext.HttpContext.RequestServices.GetService<ConnectRepository>();
+            var connectRepo = actionExecutedContext.HttpContext.RequestServices.GetService<IConnectRepository>();
             var user = await connectRepo.GetUser(userId);
             user.LastActive = DateTime.Now;
             await connectRepo.SaveAll();
