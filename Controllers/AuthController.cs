@@ -43,15 +43,11 @@ namespace ConnectApi.Controllers
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var newUserToAdd = new User
-            {
-                Firstname = userDto.Firstname,
-                Lastname = userDto.Lastname,
-                Username = userDto.Username,
-                Email = userDto.Email
-            };
+            var newUserToAdd = this._mapper.Map<User>(userDto);
+
             var createUser = await _authRepository.Register(newUserToAdd, userDto.Password);
-            return StatusCode(201);
+            var returnUser = this._mapper.Map<UserDetailDto>(createUser);
+            return CreatedAtRoute("GetUser", new { controller = "User", Id = createUser.Id }, returnUser);
         }
 
         [HttpPost("login")]
