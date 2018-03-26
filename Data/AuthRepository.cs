@@ -16,11 +16,13 @@ namespace ConnectApi.Data
             if (await _context.User.AnyAsync(x => x.Username == username)) return true;
             return false;
         }
+
         public async Task<bool> EmailExists(string email)
         {
             if (await _context.User.AnyAsync(x => x.Email == email)) return true;
             return false;
         }
+
         public async Task<User> Register(User user, string password)
         {
             byte[] passwordHash, passwordSalt;
@@ -61,5 +63,6 @@ namespace ConnectApi.Data
             }
             return true;
         }
+
     }
 }
