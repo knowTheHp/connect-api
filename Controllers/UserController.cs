@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using connect_api.Data;
 using connect_api.Dtos;
+using connect_api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace connect_api.Controllers
 {
+    [ServiceFilter(typeof(UserActivity))]
     [Authorize]
     [Route("api/[controller]")]
     public class UserController : Controller
